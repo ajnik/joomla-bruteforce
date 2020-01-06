@@ -10,4 +10,4 @@ Usage:
 Optional parameters:
 	
 	-p or --proxy http://127.0.0.1:8080
-	-v or --verbose Not default
+	-v or --verbose
