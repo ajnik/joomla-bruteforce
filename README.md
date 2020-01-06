@@ -6,6 +6,9 @@ Tested on Joomla! 3.8.8
 Usage:
 
 	python3 joomla-brute.py -u http://10.10.10.150 -w /usr/share/wordlist/rockyou.txt -usr admin
+	
+	chmod +x joomla-brute.py
+	./joomla-brute.py -u http://10.10.10.150 -w /usr/share/wordlist/rockyou.txt -usr admin
 
 Optional parameters:
 	

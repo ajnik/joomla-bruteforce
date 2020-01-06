@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import requests
 from bs4 import BeautifulSoup
 import argparse
@@ -27,7 +29,7 @@ class Joomla():
         parser.add_argument('-usr', '--username', required=True, type=str, help='One single username')
         #optional
         parser.add_argument('-p', '--proxy', type=str, help='Specify proxy. Optional. http://127.0.0.1:8080')
-        parser.add_argument('-v', '--verbose', action='store_true', help='Shows output. Not default.')
+        parser.add_argument('-v', '--verbose', action='store_true', help='Shows output.')
         
         args = parser.parse_args()
         #parse args and save proxy
