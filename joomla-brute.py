@@ -94,7 +94,12 @@ class Joomla():
                         break
         else:
             None
-            
+    
+    
+    @staticmethod
+    def doGET(username, password):
+        
+    
     @staticmethod
     def getdata(path):
         
