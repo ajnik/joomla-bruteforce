@@ -104,7 +104,7 @@ class Joomla():
 
     @staticmethod
     def getdata(path):
-        with open(path, 'rb+') as f:
+        with open(path, 'rb') as f:
             data = ([line.rstrip() for line in f])
             f.close()
         return data
